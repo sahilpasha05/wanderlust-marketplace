@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, Menu, X, Globe, User } from "lucide-react";
+import { Search, Menu, X, Globe, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const { user, profile, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -16,10 +18,12 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const solid = scrolled || !isHome;
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || !isHome
+        solid
           ? "bg-background/95 backdrop-blur-md shadow-soft border-b border-border"
           : "bg-transparent"
       }`}
@@ -29,12 +33,11 @@ const Navbar = () => {
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <Globe className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className={`text-xl font-display font-bold ${scrolled || !isHome ? "text-foreground" : "text-background"}`}>
+          <span className={`text-xl font-display font-bold ${solid ? "text-foreground" : "text-background"}`}>
             Wanderlust
           </span>
         </Link>
 
-        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
           {[
             { to: "/", label: "Home" },
@@ -44,7 +47,7 @@ const Navbar = () => {
               key={item.to}
               to={item.to}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                scrolled || !isHome
+                solid
                   ? "text-foreground hover:bg-secondary"
                   : "text-background/90 hover:text-background hover:bg-background/10"
               }`}
@@ -58,7 +61,7 @@ const Navbar = () => {
           <Link
             to="/search"
             className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all text-sm ${
-              scrolled || !isHome
+              solid
                 ? "border-border bg-secondary hover:shadow-medium text-muted-foreground"
                 : "border-background/30 bg-background/10 backdrop-blur-sm text-background/80 hover:bg-background/20"
             }`}
@@ -66,22 +69,34 @@ const Navbar = () => {
             <Search className="w-4 h-4" />
             <span>Search destinations...</span>
           </Link>
-          <Button variant="outline" size="sm" className={`rounded-full ${scrolled || !isHome ? "" : "border-background/30 text-background bg-background/10 hover:bg-background/20"}`}>
-            <User className="w-4 h-4 mr-1" />
-            Sign in
-          </Button>
+
+          {user ? (
+            <div className="flex items-center gap-2">
+              <Link to="/dashboard">
+                <Button variant="outline" size="sm" className={`rounded-full ${solid ? "" : "border-background/30 text-background bg-background/10 hover:bg-background/20"}`}>
+                  <User className="w-4 h-4 mr-1" />
+                  {profile?.name || "Dashboard"}
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <Link to="/auth">
+              <Button variant="outline" size="sm" className={`rounded-full ${solid ? "" : "border-background/30 text-background bg-background/10 hover:bg-background/20"}`}>
+                <User className="w-4 h-4 mr-1" />
+                Sign in
+              </Button>
+            </Link>
+          )}
         </div>
 
-        {/* Mobile menu button */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className={`md:hidden p-2 rounded-lg ${scrolled || !isHome ? "text-foreground" : "text-background"}`}
+          className={`md:hidden p-2 rounded-lg ${solid ? "text-foreground" : "text-background"}`}
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -93,10 +108,16 @@ const Navbar = () => {
             <div className="container py-4 flex flex-col gap-2">
               <Link to="/" onClick={() => setMobileOpen(false)} className="px-4 py-3 rounded-xl hover:bg-secondary text-sm font-medium">Home</Link>
               <Link to="/search" onClick={() => setMobileOpen(false)} className="px-4 py-3 rounded-xl hover:bg-secondary text-sm font-medium">Explore</Link>
-              <Button variant="default" size="sm" className="mt-2 rounded-full">
-                <User className="w-4 h-4 mr-1" />
-                Sign in
-              </Button>
+              {user ? (
+                <>
+                  <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="px-4 py-3 rounded-xl hover:bg-secondary text-sm font-medium">Dashboard</Link>
+                  <button onClick={() => { signOut(); setMobileOpen(false); }} className="px-4 py-3 rounded-xl hover:bg-secondary text-sm font-medium text-left text-destructive">Sign out</button>
+                </>
+              ) : (
+                <Link to="/auth" onClick={() => setMobileOpen(false)}>
+                  <Button variant="default" size="sm" className="mt-2 rounded-full w-full">Sign in</Button>
+                </Link>
+              )}
             </div>
           </motion.div>
         )}
