@@ -30,7 +30,7 @@ const AdminDashboard = () => {
         if (error) {
           console.error("Error fetching stats:", error);
         } else {
-          setStats(data);
+          setStats(data as DashboardStats);
         }
       } catch (err) {
         console.error("Error:", err);

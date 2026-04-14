@@ -241,7 +241,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      admin_dashboard_stats: {
+        Row: {
+          total_users: number
+          total_listings: number
+          pending_listings: number
+          flagged_listings: number
+          total_bookings: number
+          pending_bookings: number
+          total_reviews: number
+          total_revenue: number
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
