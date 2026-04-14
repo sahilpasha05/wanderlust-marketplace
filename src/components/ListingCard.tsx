@@ -2,6 +2,9 @@ import { Heart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { Listing } from "@/data/mockListings";
 
 interface ListingCardProps {
@@ -12,6 +15,24 @@ interface ListingCardProps {
 const ListingCard = ({ listing, index = 0 }: ListingCardProps) => {
   const [liked, setLiked] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const { user } = useAuth();
+
+  const toggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Sign in to save listings");
+      return;
+    }
+    if (liked) {
+      await supabase.from("wishlist").delete().eq("user_id", user.id).eq("listing_id", listing.id);
+      setLiked(false);
+      toast.success("Removed from wishlist");
+    } else {
+      await supabase.from("wishlist").insert({ user_id: user.id, listing_id: listing.id });
+      setLiked(true);
+      toast.success("Added to wishlist");
+    }
+  };
 
   return (
     <motion.div
@@ -21,9 +42,7 @@ const ListingCard = ({ listing, index = 0 }: ListingCardProps) => {
     >
       <Link to={`/listing/${listing.id}`} className="group block">
         <div className="relative overflow-hidden rounded-2xl aspect-[4/3] bg-muted">
-          {!imgLoaded && (
-            <div className="absolute inset-0 bg-muted animate-pulse" />
-          )}
+          {!imgLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
           <img
             src={listing.images[0]}
             alt={listing.title}
@@ -32,10 +51,7 @@ const ListingCard = ({ listing, index = 0 }: ListingCardProps) => {
             className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
           />
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              setLiked(!liked);
-            }}
+            onClick={toggleWishlist}
             className="absolute top-3 right-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110"
           >
             <Heart className={`w-4 h-4 transition-colors ${liked ? "fill-primary text-primary" : "text-foreground"}`} />
