@@ -158,7 +158,11 @@ const Index = () => {
       </section>
 
       <section className="container py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground">Reviews</h2>
+          <p className="text-muted-foreground mt-1">What travelers are saying about their stays</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {testimonials.map((t, i) => (
             <motion.div
               key={t.id}
@@ -174,12 +178,9 @@ const Index = () => {
                 ))}
               </div>
               <p className="text-sm text-foreground leading-relaxed mb-4">"{t.text}"</p>
-              <div className="flex items-center gap-3">
-                <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
-                <div>
-                  <p className="text-sm font-medium text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.location}</p>
-                </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">{t.name}</p>
+                <p className="text-xs text-muted-foreground">{t.location}</p>
               </div>
             </motion.div>
           ))}

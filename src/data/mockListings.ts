@@ -254,26 +254,16 @@ export const mockListings: Listing[] = [
 export const testimonials = [
   {
     id: "1",
-    name: "Emma Watson",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
+    name: "Saad",
     text: "Wanderlust made planning our family vacation effortless. The villa in Bali exceeded all expectations!",
     location: "London, UK",
     rating: 5,
   },
   {
     id: "2",
-    name: "James Miller",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
+    name: "Ansh",
     text: "As a solo traveler, I love how easy it is to find unique stays. The Tokyo loft was incredible.",
     location: "San Francisco, USA",
-    rating: 5,
-  },
-  {
-    id: "3",
-    name: "Priya Sharma",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100",
-    text: "The booking process is seamless and the hosts are always amazing. My go-to platform for travel.",
-    location: "Mumbai, India",
     rating: 5,
   },
 ];

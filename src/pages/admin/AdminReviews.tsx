@@ -10,7 +10,47 @@ import type { Tables } from "@/integrations/supabase/types";
 interface ReviewWithDetails extends Tables<"reviews"> {
   listings?: Tables<"listings">;
   profiles?: { name: string; email: string };
+  reviewer_name?: string;
 }
+
+const dummyReviews: ReviewWithDetails[] = [
+  {
+    id: "dummy-review-1",
+    user_id: "dummy-user-saad-1",
+    listing_id: "9ae0c280-40c3-4748-9410-ed36306050a6",
+    rating: 5,
+    comment: "Amazing stay! Everything was clean and well organized.",
+    created_at: new Date().toISOString(),
+    reviewer_name: "saad",
+  },
+  {
+    id: "dummy-review-2",
+    user_id: "dummy-user-ansh-1",
+    listing_id: "9ae0c280-40c3-4748-9410-ed36306050a6",
+    rating: 4,
+    comment: "Great experience overall, just minor issues but nothing major.",
+    created_at: new Date().toISOString(),
+    reviewer_name: "ansh",
+  },
+  {
+    id: "dummy-review-3",
+    user_id: "dummy-user-saad-2",
+    listing_id: "9ae0c280-40c3-4748-9410-ed36306050a6",
+    rating: 3,
+    comment: "Decent place, but could improve on maintenance.",
+    created_at: new Date().toISOString(),
+    reviewer_name: "saad",
+  },
+  {
+    id: "dummy-review-4",
+    user_id: "dummy-user-ansh-2",
+    listing_id: "9ae0c280-40c3-4748-9410-ed36306050a6",
+    rating: 5,
+    comment: "Loved the ambience and location. Would definitely recommend!",
+    created_at: new Date().toISOString(),
+    reviewer_name: "ansh",
+  },
+];
 
 const AdminReviews = () => {
   const [reviews, setReviews] = useState<ReviewWithDetails[]>([]);
@@ -31,10 +71,11 @@ const AdminReviews = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setReviews(data || []);
+      setReviews([...(dummyReviews as ReviewWithDetails[]), ...(data || [])]);
     } catch (err) {
       console.error("Error fetching reviews:", err);
-      toast.error("Failed to load reviews");
+      setReviews(dummyReviews);
+      toast.error("Failed to load reviews, showing demo reviews");
     } finally {
       setLoading(false);
     }
@@ -65,7 +106,8 @@ const AdminReviews = () => {
   const filteredReviews = reviews.filter(
     (review) =>
       review.listings?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      review.comment?.toLowerCase().includes(searchTerm.toLowerCase())
+      review.comment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      review.reviewer_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const RatingStars = ({ rating }: { rating: number }) => (
@@ -102,6 +144,9 @@ const AdminReviews = () => {
             <Card key={review.id} className="p-6 rounded-xl border-0 bg-secondary/50">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">
+                    {review.reviewer_name || review.profiles?.name || "Guest"}
+                  </p>
                   <p className="font-semibold text-foreground mb-1">
                     {review.listings?.title || "Listing deleted"}
                   </p>
